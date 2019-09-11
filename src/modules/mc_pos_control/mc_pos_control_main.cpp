@@ -656,7 +656,8 @@ MulticopterPositionControl::run()
 
 			// Inform FlightTask about the input and output of the velocity controller
 			// This is used to properly initialize the velocity setpoint when onpening the position loop (position unlock)
-			_flight_tasks.updateVelocityControllerIO(Vector3f(local_pos_sp.x, local_pos_sp.y, local_pos_sp.z), local_pos_sp.thrust);
+			_flight_tasks.updateVelocityControllerIO(Vector3f(local_pos_sp.vx, local_pos_sp.vy, local_pos_sp.vz),
+					local_pos_sp.thrust);
 
 			_wv_dcm_z_sp_prev = Quatf(attitude_setpoint.q_d).dcm_z();
 
