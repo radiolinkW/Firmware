@@ -52,7 +52,6 @@ bool FlightTaskManualPositionSmoothVel::activate(vehicle_local_position_setpoint
 		_smoothing[i].reset(accel_prev(i), vel_prev(i), pos_prev(i));
 	}
 
-	_initEkfResetCounters();
 	_resetPositionLock();
 
 	return ret;
@@ -68,7 +67,6 @@ void FlightTaskManualPositionSmoothVel::reActivate()
 
 	_smoothing[2].reset(0.f, 0.f, _position(2));
 
-	_initEkfResetCounters();
 	_resetPositionLock();
 }
 
@@ -105,38 +103,26 @@ void FlightTaskManualPositionSmoothVel::_resetPositionLock()
 	_position_setpoint_z_locked = NAN;
 }
 
-void FlightTaskManualPositionSmoothVel::_initEkfResetCounters()
+void FlightTaskManualPositionSmoothVel::_ekfResetHandlerPositionXY()
 {
-	_reset_counters.xy = _sub_vehicle_local_position->get().xy_reset_counter;
-	_reset_counters.vxy = _sub_vehicle_local_position->get().vxy_reset_counter;
-	_reset_counters.z = _sub_vehicle_local_position->get().z_reset_counter;
-	_reset_counters.vz = _sub_vehicle_local_position->get().vz_reset_counter;
+	_smoothing[0].setCurrentPosition(_position(0));
+	_smoothing[1].setCurrentPosition(_position(1));
 }
 
-void FlightTaskManualPositionSmoothVel::_checkEkfResetCounters()
+void FlightTaskManualPositionSmoothVel::_ekfResetHandlerVelocityXY()
 {
-	// Check if a reset event has happened.
-	if (_sub_vehicle_local_position->get().xy_reset_counter != _reset_counters.xy) {
-		_smoothing[0].setCurrentPosition(_position(0));
-		_smoothing[1].setCurrentPosition(_position(1));
-		_reset_counters.xy = _sub_vehicle_local_position->get().xy_reset_counter;
-	}
+	_smoothing[0].setCurrentVelocity(_velocity(0));
+	_smoothing[1].setCurrentVelocity(_velocity(1));
+}
 
-	if (_sub_vehicle_local_position->get().vxy_reset_counter != _reset_counters.vxy) {
-		_smoothing[0].setCurrentVelocity(_velocity(0));
-		_smoothing[1].setCurrentVelocity(_velocity(1));
-		_reset_counters.vxy = _sub_vehicle_local_position->get().vxy_reset_counter;
-	}
+void FlightTaskManualPositionSmoothVel::_ekfResetHandlerPositionZ()
+{
+	_smoothing[2].setCurrentPosition(_position(2));
+}
 
-	if (_sub_vehicle_local_position->get().z_reset_counter != _reset_counters.z) {
-		_smoothing[2].setCurrentPosition(_position(2));
-		_reset_counters.z = _sub_vehicle_local_position->get().z_reset_counter;
-	}
-
-	if (_sub_vehicle_local_position->get().vz_reset_counter != _reset_counters.vz) {
-		_smoothing[2].setCurrentVelocity(_velocity(2));
-		_reset_counters.vz = _sub_vehicle_local_position->get().vz_reset_counter;
-	}
+void FlightTaskManualPositionSmoothVel::_ekfResetHandlerVelocityZ()
+{
+	_smoothing[2].setCurrentVelocity(_velocity(2));
 }
 
 void FlightTaskManualPositionSmoothVel::_updateSetpoints()
