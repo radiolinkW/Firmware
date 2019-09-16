@@ -50,7 +50,6 @@ bool FlightTaskManualAltitudeSmoothVel::activate(vehicle_local_position_setpoint
 
 	_smoothing.reset(last_setpoint.acc_z, last_setpoint.vz, last_setpoint.z);
 
-	_initEkfResetCounters();
 	_resetPositionLock();
 
 	return ret;
@@ -62,7 +61,6 @@ void FlightTaskManualAltitudeSmoothVel::reActivate()
 	// using the generated jerk, reset the z derivatives to zero
 	_smoothing.reset(0.f, 0.f, _position(2));
 
-	_initEkfResetCounters();
 	_resetPositionLock();
 }
 
@@ -85,23 +83,14 @@ void FlightTaskManualAltitudeSmoothVel::_resetPositionLock()
 	_position_setpoint_z_locked = NAN;
 }
 
-void FlightTaskManualAltitudeSmoothVel::_initEkfResetCounters()
+void FlightTaskManualAltitudeSmoothVel::_ekfResetHandlerPositionZ()
 {
-	_reset_counters.z = _sub_vehicle_local_position->get().z_reset_counter;
-	_reset_counters.vz = _sub_vehicle_local_position->get().vz_reset_counter;
+	_smoothing.setCurrentPosition(_position(2));
 }
 
-void FlightTaskManualAltitudeSmoothVel::_checkEkfResetCounters()
+void FlightTaskManualAltitudeSmoothVel::_ekfResetHandlerVelocityZ()
 {
-	if (_sub_vehicle_local_position->get().z_reset_counter != _reset_counters.z) {
-		_smoothing.setCurrentPosition(_position(2));
-		_reset_counters.z = _sub_vehicle_local_position->get().z_reset_counter;
-	}
-
-	if (_sub_vehicle_local_position->get().vz_reset_counter != _reset_counters.vz) {
-		_smoothing.setCurrentVelocity(_velocity(2));
-		_reset_counters.vz = _sub_vehicle_local_position->get().vz_reset_counter;
-	}
+	_smoothing.setCurrentVelocity(_velocity(2));
 }
 
 void FlightTaskManualAltitudeSmoothVel::_updateSetpoints()
