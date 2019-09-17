@@ -3432,9 +3432,7 @@ protected:
 			} else {
 				matrix::Quatf q = matrix::Eulerf(att_sp.roll_body, att_sp.pitch_body, att_sp.yaw_body);
 
-				for (size_t i = 0; i < 4; i++) {
-					msg.q[i] = q(i);
-				}
+				q.copyTo(msg.q);
 			}
 
 			msg.body_roll_rate = att_rates_sp.roll;

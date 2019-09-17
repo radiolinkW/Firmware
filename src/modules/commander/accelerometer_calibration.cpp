@@ -716,10 +716,7 @@ calibrate_return read_accelerometer_avg(int sensor_correction_sub, int (&subs)[m
 	for (unsigned i = 0; i < max_accel_sens; i++) {
 		matrix::Vector3f accel_sum_vec(&accel_sum[i][0]);
 		accel_sum_vec = board_rotation * accel_sum_vec;
-
-		for (size_t j = 0; j < 3; j++) {
-			accel_sum[i][j] = accel_sum_vec(j);
-		}
+		accel_sum_vec.copyTo(accel_sum[i]);
 	}
 
 	for (unsigned s = 0; s < max_accel_sens; s++) {
