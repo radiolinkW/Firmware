@@ -10,6 +10,7 @@ ist8310 -C start
 
 # Internal I2C bus
 hmc5883 -C -T -I -R 4 start
+qmc5883 -I start
 
 # Internal SPI bus ICM-20608-G
 mpu6000 -T 20608 start
